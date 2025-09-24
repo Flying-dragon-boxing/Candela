@@ -28,6 +28,10 @@ void WfRead::ignore(int ik)
 	{
 		wfabacus.readOCC(*wfpt, ik);
 	}
+	else if(INPUT.wf_in_type=="ABACUS2")
+	{
+		wfabacus2.readOCC(*wfpt, ik);
+	}
 	else if(INPUT.wf_in_type=="QE2")
 	{
 		wfqe.readOCC2(*wfpt, ik);
@@ -64,6 +68,10 @@ void WfRead:: Init()
 	else if(INPUT.wf_in_type=="ABACUS")
 	{
 		wfabacus.readOUT(*wfpt);
+	}
+	else if(INPUT.wf_in_type=="ABACUS2")
+	{
+		wfabacus2.readOUT(*wfpt);
 	}
 	else
 	{
@@ -104,6 +112,11 @@ void WfRead::readWF(int ik)
 		wfabacus.readOCC(*wfpt,ik);
 		if(!INPUT.readvmatrix)	wfabacus.readWF(*wfpt,ik);
 	}
+	else if(INPUT.wf_in_type=="ABACUS2")
+	{
+		wfabacus2.readOCC(*wfpt,ik);
+		if(!INPUT.readvmatrix)	wfabacus2.readWF(*wfpt,ik);
+	}
 	else
 	{
 		cout<<"No such file type!"<<endl;
@@ -136,6 +149,10 @@ void WfRead::readOCC(int ik)
 	else if(INPUT.wf_in_type=="ABACUS")
 	{
 		wfabacus.readOCC(*wfpt,ik);
+	}
+	else if(INPUT.wf_in_type=="ABACUS2")
+	{
+		wfabacus2.readOCC(*wfpt,ik);
 	}
 	else
 	{
