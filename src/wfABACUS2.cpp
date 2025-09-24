@@ -97,7 +97,7 @@ void WfABACUS2::readOUT(Wavefunc & wf)
 
 	for(int i=0;i<nkpoint;i++)
 	{
-		ifskwt>>useless>>useless>>useless>>wk[i];
+		ifskwt>>useless>>useless>>useless>>useless>>wk[i];
 		// cout<<"wk"<<wk[i]<<endl;
 		// wk[i] = 1;
 	}
@@ -130,11 +130,11 @@ void WfABACUS2::readOUT(Wavefunc & wf)
 		cout<<"Erro in opening OCC file!"<<endl;
 		exit(0);
 	}
+	getline(ifsocc,txt);
+	getline(ifsocc,txt);
 	for(int ik = 0; ik < nkpoint; ++ik)
 	{
 		ifsocc>>useless;
-		getline(ifsocc,txt);
-		getline(ifsocc,txt);
 		getline(ifsocc,txt);
 		for(int i=0;i<nband;i++)
 		{
