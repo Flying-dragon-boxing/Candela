@@ -85,8 +85,12 @@ void WfABACUS2::readOUT(Wavefunc & wf)
 
 	//get number of kpoint
 	//TODO: to be convert to nkstot_ibz
-	searchead(ifskwt,txt,"nkstot",2);
-	nkpoint = str2int(txt.substr(7,10));
+	searchead(ifskwt,txt,"nkstot",1);
+	std::cout << txt << std::endl;
+	nkpoint = str2int(txt.substr(3));	
+	// searchead(ifskwt,txt,"nkstot",2);
+	// std::cout << txt << std::endl;
+	// nkpoint = str2int(txt.substr(7));
 	// std::cout << "number of kpoints: " << nkpoint << std::endl;
 	ifskwt >> txt;
 	// ifnecheckv(txt,string("IBZ"));
@@ -123,7 +127,7 @@ void WfABACUS2::readOUT(Wavefunc & wf)
 	//get occ
 	energy=new double[nkpoint*nband];
 	occ=new double [nkpoint*nband];
-	string occname=INPUT.wfdirectory+"/eig.txt";
+	string occname=INPUT.wfdirectory+"/eig_occ.txt";
 	ifsocc.open(occname.c_str());
 	if(!ifsocc)
 	{
@@ -131,18 +135,48 @@ void WfABACUS2::readOUT(Wavefunc & wf)
 		exit(0);
 	}
 	getline(ifsocc,txt);
+	std::cout << txt <<std::endl;
 	getline(ifsocc,txt);
+	std::cout << txt <<std::endl;
+	getline(ifsocc,txt);
+	std::cout << txt <<std::endl;
 	for(int ik = 0; ik < nkpoint; ++ik)
 	{
 		ifsocc>>useless;
+		// std::cout << useless;
 		getline(ifsocc,txt);
+		// std::cout << txt <<std::endl;
 		for(int i=0;i<nband;i++)
 		{
 			ifsocc>>useless>>energy[ik*nband+i]>>occ[ik*nband+i];
-			// std::cout<<energy[ik*nband+i]<<' '<<occ[ik*nband+i]<<std::endl;
+			// std::cout<<useless<<'\t'<<energy[ik*nband+i]<<'\t'<<occ[ik*nband+i]<<std::endl;
 		}
+		getline(ifsocc,txt);
 	}
 	ifsocc.close();
+
+	// energy=new double[nkpoint*nband];
+	// occ=new double [nkpoint*nband];
+	// string occname=INPUT.wfdirectory+"/eig.txt";
+	// ifsocc.open(occname.c_str());
+	// if(!ifsocc)
+	// {
+	// 	cout<<"Erro in opening OCC file!"<<endl;
+	// 	exit(0);
+	// }
+	// getline(ifsocc,txt);
+	// getline(ifsocc,txt);
+	// for(int ik = 0; ik < nkpoint; ++ik)
+	// {
+	// 	ifsocc>>useless;
+	// 	getline(ifsocc,txt);
+	// 	for(int i=0;i<nband;i++)
+	// 	{
+	// 		ifsocc>>useless>>energy[ik*nband+i]>>occ[ik*nband+i];
+	// 		// std::cout<<energy[ik*nband+i]<<' '<<occ[ik*nband+i]<<std::endl;
+	// 	}
+	// }
+	// ifsocc.close();
 
 }
 
