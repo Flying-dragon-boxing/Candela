@@ -175,6 +175,7 @@ void WfRead:: readvmatrix(const int ik, double* vmatrix)
 	rwread(binfs, vmatrix, nbb);
 	binfs>>tail;
 	ifnecheckv(head, tail);
+	binfs.close();
 }
 
 void WfRead::calvmatrix(double* vmatrix)
