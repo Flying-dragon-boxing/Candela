@@ -84,16 +84,25 @@ void WfABACUS2::readOUT(Wavefunc & wf)
 	wf.nband=nband;
 
 	//get number of kpoint
-	//TODO: to be convert to nkstot_ibz
 	searchead(ifskwt,txt,"nkstot",1);
 	std::cout << txt << std::endl;
-	nkpoint = str2int(txt.substr(3));	
-	// searchead(ifskwt,txt,"nkstot",2);
-	// std::cout << txt << std::endl;
-	// nkpoint = str2int(txt.substr(7));
+	// parse "= 64"
+	size_t pos = txt.find('=');
+	if (pos != string::npos) {
+		nkpoint = str2int(txt.substr(pos + 1));
+	}
+	// check if symmetry reduction is applied by looking for "Number of irreducible"
+	// read next line and check
+	string nextline;
+	getline(ifskwt, nextline);
+	if (nextline.find("irreducible") != string::npos) {
+		pos = nextline.find('=');
+		if (pos != string::npos) {
+			nkpoint = str2int(nextline.substr(pos + 1));
+			// std::cout << "symmetry reduced kpoints: " << nkpoint << std::endl;
+		}
+	}
 	// std::cout << "number of kpoints: " << nkpoint << std::endl;
-	ifskwt >> txt;
-	// ifnecheckv(txt,string("IBZ"));
 	
 	searchead(ifskwt,txt,"KPOINTS",1);
 	INPUT.nkpoint=nkpoint;
@@ -113,7 +122,7 @@ void WfABACUS2::readOUT(Wavefunc & wf)
 	ss >> useless >> useless >> txt >> useless >> useless >> useless >> nx >> useless >> ny >> useless >> nz;
 	checkstr="wave";
 	ifnecheckv(checkstr,txt);
-	// std::cout << "FFT grid: " << nx << " " << ny << " " << nz << std::endl;
+	std::cout << "FFT grid: " << nx << " " << ny << " " << nz << std::endl;
 
 	//get number of fermi energy
 	searchead(ifskwt,txt,"E_exx",1);

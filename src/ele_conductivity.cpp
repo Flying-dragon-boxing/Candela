@@ -103,7 +103,12 @@ void Ele_Conductivity::method1()
 			std::cout<<"No "<<ifolderstr<<" exists."<<std::endl;
 			exit(0);
 		}
-		chdir(ifolderstr.c_str());
+		auto err = chdir(ifolderstr.c_str());
+		if(err!=0)
+		{
+			std::cout<<"Failed to enter "<<ifolderstr<<"."<< ", error code: " << err << std::endl;
+			exit(0);
+		}
 	}
 
 	Wavefunc WF;
@@ -128,7 +133,7 @@ void Ele_Conductivity::method1()
 #endif
 		wfr.readWF(ik);
 		int nband=WF.nband;
-		std::cout<<"scf "<<ifolder<<" ; kpoint "<<ik+1<<std::endl;
+		// std::cout<<"scf "<<ifolder<<" ; kpoint "<<ik+1<<std::endl;
 		//WF.print(0);
 
 		int nbb = (nband-1) * nband / 2;
@@ -149,7 +154,7 @@ void Ele_Conductivity::method1()
 			}
 			wfr.calvmatrix(vmatrix);
 		}
-		std::cout<<"nband: "<<nband<<std::endl;
+		// std::cout<<"nband: "<<nband<<std::endl;
 			
 
 		double factor2=factor/INPUT.dw*pow(WF.factor,2)/INPUT.vol;
