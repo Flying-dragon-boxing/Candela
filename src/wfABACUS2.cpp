@@ -83,15 +83,35 @@ void WfABACUS2::readOUT(Wavefunc & wf)
 	ifnecheckv(checkstr,txt);
 	wf.nband=nband;
 
-	//get number of kpoint
-	//TODO: to be convert to nkstot_ibz
-	searchead(ifskwt,txt,"nkstot",2);
-	nkpoint = str2int(txt.substr(7,10));
-	// std::cout << "number of kpoints: " << nkpoint << std::endl;
-	ifskwt >> txt;
-	// ifnecheckv(txt,string("IBZ"));
-	
-	searchead(ifskwt,txt,"KPOINTS",1);
+    // Read the final global count before the global k-point table. Hybrid
+    // runs may disable symmetry and print only one nkstot line.
+    bool found_kpoint_table = false;
+    nkpoint = 0;
+    while (std::getline(ifskwt, txt))
+    {
+        std::stringstream line(txt);
+        std::string key;
+        line >> key;
+        if (key == "nkstot" || key == "nkstot_ibz")
+        {
+            const std::size_t equal = txt.find('=');
+            if (equal != std::string::npos)
+            {
+                std::stringstream count_line(txt.substr(equal + 1));
+                count_line >> nkpoint;
+            }
+        }
+        else if (key == "KPOINTS")
+        {
+            found_kpoint_table = true;
+            break;
+        }
+    }
+    if (!found_kpoint_table || nkpoint <= 0)
+    {
+        std::cerr << "Cannot read the global ABACUS k-point count/table" << std::endl;
+        std::exit(EXIT_FAILURE);
+    }
 	INPUT.nkpoint=nkpoint;
 	wk=new double [nkpoint];
 
@@ -111,12 +131,29 @@ void WfABACUS2::readOUT(Wavefunc & wf)
 	ifnecheckv(checkstr,txt);
 	// std::cout << "FFT grid: " << nx << " " << ny << " " << nz << std::endl;
 
-	//get number of fermi energy
-	searchead(ifskwt,txt,"E_exx",1);
-	ifskwt>>txt>>useless>>INPUT.fermiE; //in eV
-	checkstr="E_Fermi";
-	// std::cout << "Fermi energy: " << INPUT.fermiE << " eV" << std::endl;
-	ifnecheckv(checkstr,txt);
+    // Hybrid separate loops print several energies; occupations correspond
+    // to the last converged Fermi energy.
+    bool found_fermi = false;
+    while (std::getline(ifskwt, txt))
+    {
+        std::stringstream line(txt);
+        std::string key;
+        double energy_ry = 0.0;
+        double energy_ev = 0.0;
+        if (line >> key >> energy_ry >> energy_ev)
+        {
+            if (key == "E_Fermi")
+            {
+                INPUT.fermiE = energy_ev;
+                found_fermi = true;
+            }
+        }
+    }
+    if (!found_fermi)
+    {
+        std::cerr << "Cannot read the final ABACUS Fermi energy" << std::endl;
+        std::exit(EXIT_FAILURE);
+    }
 	wf.factor=1;
 	ifskwt.close();
 	

@@ -43,3 +43,7 @@ three-component files and newer four-component EXX files. Requesting `exx` from
 an older three-component file fails explicitly. The fourth component is zero
 for non-hybrid calculations. Examples: `vmatrix_components momentum,nonlocal,exx`
 or `vmatrix_components exx`.
+
+The ABACUS2 metadata reader supports both symmetry-enabled and hybrid logs
+with a single global `nkstot` line. It uses the last `E_Fermi` entry to match
+converged hybrid occupations. Modern `eig_occ.txt` is supported for `nspin 1`.
