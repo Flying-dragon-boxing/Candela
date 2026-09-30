@@ -1,4 +1,5 @@
 #include "input.h"
+#include "vmatrix_components.h"
 #include <cstdlib>
 #include <iostream>
 #include <fstream>
@@ -106,6 +107,7 @@ Input::Input()
 	nscf = 0;
 	n_fwhm = 1;
 	readvmatrix = false;
+    vmatrix_components = "total";
 	cond_method = 1;
 	cond_dt = 0.06;
 
@@ -580,6 +582,7 @@ void Input::Read(const string &fn)
         else if (strcmp("smear", word) == 0) read_value(ifs, smear);
 		else if (strcmp("smearinvw", word) == 0) read_value(ifs, smearinvw);
         else if (strcmp("readvmatrix", word) == 0) read_value(ifs, readvmatrix);
+        else if (strcmp("vmatrix_components", word) == 0) read_value(ifs, vmatrix_components);
 		else if (strcmp("cond_method", word) == 0) read_value(ifs, cond_method);
 		else if (strcmp("cond_dt", word) == 0) read_value(ifs, cond_dt);
 		else if (strcmp("cond_intra", word) == 0) read_value(ifs, cond_intra);
@@ -723,6 +726,23 @@ void Input::Read(const string &fn)
 
 void Input::Check(void)
 {
+    if (vmatrix_components != "total")
+    {
+        try
+        {
+            VMatrixComponents::selection_mask(vmatrix_components);
+            if (!readvmatrix || cond_intra)
+                throw std::runtime_error("vmatrix_components requires readvmatrix 1 and cond_intra 0");
+            if (wf_in_type != "ABACUS" && wf_in_type != "ABACUS2")
+                throw std::runtime_error("vmatrix_components requires ABACUS or ABACUS2 input");
+        }
+        catch (const std::exception& error)
+        {
+            std::cerr << error.what() << std::endl;
+            std::exit(EXIT_FAILURE);
+        }
+    }
+
 	if( vacuum_x1 < 0.0 ) QUIT("vacuum_x1 < 0.0"); 
 	if( vacuum_x2 < 0.0 ) QUIT("vacuum_x2 < 0.0"); 
 	if( vacuum_y1 < 0.0 ) QUIT("vacuum_y1 < 0.0"); 

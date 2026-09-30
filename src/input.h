@@ -273,7 +273,8 @@ public:
 	bool smearinvw;
 	double *fwhm;
 	int n_fwhm; //calculate different fwhm at the same time by qianrui 2020-5-13
-	bool readvmatrix; 
+	bool readvmatrix;
+    std::string vmatrix_components; // total, all, or comma-separated momentum/nonlocal/mgga
 	int cond_method;
 	double cond_dt;
 	bool cond_intra = false;

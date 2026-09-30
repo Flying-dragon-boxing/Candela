@@ -124,14 +124,36 @@ void WfABACUS2::readOUT(Wavefunc & wf)
 	energy=new double[nkpoint*nband];
 	occ=new double [nkpoint*nband];
 	string occname=INPUT.wfdirectory+"/eig.txt";
-	ifsocc.open(occname.c_str());
-	if(!ifsocc)
-	{
-		cout<<"Erro in opening OCC file!"<<endl;
-		exit(0);
-	}
-	getline(ifsocc,txt);
-	getline(ifsocc,txt);
+    ifsocc.open(occname.c_str());
+    bool modern_occupations = false;
+    if (!ifsocc)
+    {
+        ifsocc.clear();
+        occname = INPUT.wfdirectory + "/eig_occ.txt";
+        ifsocc.open(occname.c_str());
+        modern_occupations = true;
+    }
+    if (!ifsocc)
+    {
+        std::cerr << "Cannot open eig.txt or eig_occ.txt" << std::endl;
+        std::exit(EXIT_FAILURE);
+    }
+    getline(ifsocc, txt);
+    getline(ifsocc, txt);
+    if (modern_occupations)
+    {
+        getline(ifsocc, txt);
+        std::stringstream spin_line(txt);
+        std::string spin_label;
+        std::string number_label;
+        int spins = 0;
+        spin_line >> spin_label >> number_label >> spins;
+        if (spins != 1)
+        {
+            std::cerr << "ABACUS2 eig_occ.txt currently supports nspin 1 only" << std::endl;
+            std::exit(EXIT_FAILURE);
+        }
+    }
 	for(int ik = 0; ik < nkpoint; ++ik)
 	{
 		ifsocc>>useless;

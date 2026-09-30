@@ -1,4 +1,5 @@
 #include "wfRead.h"
+#include "vmatrix_components.h"
 #include <stdio.h>
 #include "matrixmultip.h"
 //created by qianrui 2020-2-5
@@ -163,6 +164,25 @@ void WfRead::readOCC(int ik)
 }
 void WfRead:: readvmatrix(const int ik, double* vmatrix)
 {
+    if (INPUT.vmatrix_components != "total")
+    {
+        try
+        {
+            if (INPUT.cond_intra)
+                throw std::runtime_error("ABACUS component files contain interband pairs only");
+            const int mask = VMatrixComponents::selection_mask(INPUT.vmatrix_components);
+            std::stringstream filename;
+            filename << INPUT.wfdirectory << "/vmatrix_components" << ik + 1 << ".dat";
+            VMatrixComponents::read(filename.str(), wfpt->nband, mask, vmatrix);
+        }
+        catch (const std::exception& error)
+        {
+            std::cerr << error.what() << std::endl;
+            std::exit(EXIT_FAILURE);
+        }
+        return;
+    }
+
 	int nband = wfpt->nband;
 	int nbb = (nband-1) * nband / 2;
 	if(INPUT.cond_intra) nbb += nband;
@@ -175,6 +195,7 @@ void WfRead:: readvmatrix(const int ik, double* vmatrix)
 	rwread(binfs, vmatrix, nbb);
 	binfs>>tail;
 	ifnecheckv(head, tail);
+    binfs.close();
 }
 
 void WfRead::calvmatrix(double* vmatrix)
