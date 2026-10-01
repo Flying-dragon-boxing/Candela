@@ -69,7 +69,8 @@ bool CellFile::ReadGeometry_XYZ( Cell &cel, ifstream &ifs)
 	cout << tmp_natom << endl;
 	assert(tmp_natom==INPUT.natom);
 	string title;
-	READ_VALUE(ifs, title);
+	ifs.ignore(20000, '\n');
+	getline(ifs, title);
 	cout << title << endl;
 
 	int *count_atom = new int[INPUT.ntype];
